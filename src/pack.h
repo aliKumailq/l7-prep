@@ -30,6 +30,26 @@ namespace pack_detail {
     using _packIndexToType = packIndexToType<QueryIndex, Args...>::type;
 
 
+    //    template <int Accumulated, typename QueryType, typename... Args>
+
+    template <int Acc, typename QueryType, typename... Args>
+    constexpr int _p = -1; // not found
+
+
+    template <int Acc, typename QueryType,typename Arg ,typename... Args>
+    constexpr int _p<Acc, QueryType, Arg, Args...> = _p<Acc + 1, QueryType, Args...>; // recursive case
+    
+    ;
+
+    template <int Acc, typename QueryType>
+    constexpr int  _p<Acc, QueryType, QueryType> = Acc; // base case
+
+    template <typename QueryType, typename... Args> 
+    constexpr int packTypeToIndex = _p<0, QueryType, Args...>;
+    
+
+
+
 
 
 }
@@ -43,6 +63,9 @@ struct Pack {
 
     template <int QueryIndex>
     using type = pack_detail::_packIndexToType<QueryIndex,Args...>;
+
+    template <typename QueryType> 
+    constexpr static int index = pack_detail::packTypeToIndex<QueryType, Args...>;
 
 };
 
