@@ -31,14 +31,6 @@ namespace pack_detail {
 
 
 
-    template <int Accumulated, typename QueryType, typename... Args>
-    constexpr int _packTypeToIndex = -(Accumulated + 1); // if not found
-
-    template<int Accumulated, typename QueryType>
-    constexpr int _packTypeToIndex<Accumulated, QueryType, QueryType> = 0; // case when found
-
-
-
 
 }
 
