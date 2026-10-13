@@ -1,7 +1,19 @@
 Hash table:
+  - Total memory cost is much more expensive than the last two sparse mappings. Each key/value pair might also store a pointer to the next key/value pair should their be a bucket-collison (i.e. a linked-list with multiple key/value pairs).
+  - On average, O(1) (i.e. constant) memory access. Iterating through a set of keys for a given entity (or vice-verca) would result in terrible cache performance. Almost none of the index values are sequential in memory, causing continous cache misses.
+  - Removing a specific type-instantiation for a given entity is not high maintenence. All you must do is remove the entities key-value pair for the unordered-map of the corresponding component type. Removing an entity is much higher maintenence; for EVERY component-types hash table, you must (1) check if that table HAS a key/value pair for a given entity and (2) remove it.
 
 Map:
+  - Total memory cost is much more expensive than the last two sparse mappings. Each vertex in the tree (i.e. each key/value pair) must store (1-3) pointers (to parents and/or children) along side its key and value.
+  - On average, O(logN) (so slower then constant). Also has poor cache performance (i.e. a high miss rate) because the verticies for each red/black/avl tree are stored dynamically.
+  - Maintenence: You suffer from O(logN) insertion and deletion. From a programming perspective, its the same as my answer for Hash Table.
 
-Sparse mapping 1:
+Sparse mapping 1: 
+  - N * K cost. The issue with this is that we waste storage by holding -1 for each type for each entity that does NOT have that component type.
+  - Constant time accessing. Faster to iterate through all the componentIdx's for a fixed Entity rather than vice verca. Because all the type-indexes for a given entity are sequential in virtual memory.
+  - Adding/removing component instantiations are very low-maintainence. Just a matter of changing from/to -1 for a given m[entityID][componentIdx]. Removing an entity can be very expensive because if the entity was not at the end of the vector, we have to waste time re-writing the entire vector to ensure the remaining entities are sequential in memory. Adding a new entity is low maintenence, as we just call pushback with a new array of types, where the need for memory allocation is unlikeley since vectors double their memory allocation when capacity is ever reached.
 
 Sparse mapping 2:
+- N*K memory cost. Wastes storage because not every entity might instantiate all K components. The components that dont get instantiated are given an index of -1. Ideally they dont occupy memory at all.
+- Constant time access. Faster to iterate through all entities for the index of a FIXED component type. This is because the index's for each entity (given a fixed component type) are sequential in memory (i.e. they exhibit spatial locality so a higher cache hit rate.)
+- Adding/removing component instantiations are low maintenence for the same reason as Sparse Mapping 1. Adding/removing an entity has worse maintenence because to do so, you must add/remove that entity's componentIdx for each of the K vectors inside the array.
